@@ -1,0 +1,15 @@
+# /etc/systemd/system/kubectl-proxy.service
+# Dashboard http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/
+
+[Unit]
+Description=kubectl proxy
+Documentation=http://kubernetes.io/docs/
+
+[Service]
+ExecStart=/usr/bin/kubectl --kubeconfig /root/.kube/config proxy --address=0.0.0.0  --accept-hosts=^*$ --port=8001
+Restart=always
+StartLimitInterval=0
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
