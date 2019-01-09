@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitlab-ce
+spec:
+  selector:
+    matchLabels:
+      app: gitlab-ce
+  template:
+    metadata:
+      labels:
+        app: gitlab-ce
+    spec:
+      containers:
+      - name: gitlab-ce
+        image: gitlab/gitlab-ce:11.6.0-ce.0
+        ports:
+        - containerPort: 443
+        - containerPort: 80
+        - containerPort: 22
+        resources:
+          limits:
+            memory: "4096Mi"
+            cpu: "2"
+          requests:
+            memory: "4096Mi"
+            cpu: "1"
+        volumeMounts:
+          - mountPath: /etc/gitlab
+            name: gitlab-configPath
+          - mountPath: /var/log/gitlab
+            name: gitlab-logPath
+          - mountPath: /var/opt/gitlab
+            name: gitlab-data
+      volumes:
+        - name: gitlab-configPath
+          hostPath:
+            path: /b2c_dev/docker-compose/gitlab_data/config
+            type: Directory
+        - name: gitlab-logPath
+          hostPath:
+            path: /b2c_dev/docker-compose/gitlab_data/logs
+            type: Directory
+        - name: gitlab-data
+          hostPath:
+            path: /b2c_dev/docker-compose/gitlab_data/data
+            type: Directory
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: gitlab
+  labels:
+    app: gitlab
+spec:
+  selector:
+    app: gitlab
+  ports:
+  - port: 443
+    targetPort: 443
+  - port: 80
+    targetPort: 80
+  - port: 22
+    targetPort: 22
+  type: NodePort
