@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: elasticsearch-head
+  labels:
+    app: elasticsearch-head
 spec:
   selector:
     matchLabels:
@@ -23,11 +25,14 @@ spec:
             memory: "64Mi"
             cpu: "100m"  
       
----   
+---
+
 kind: Service
 apiVersion: v1
 metadata:
   name: elasticsearch-head
+  labels:
+    app: elasticsearch-head
 spec:
   selector:
     app: elasticsearch-head
