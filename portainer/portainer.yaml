@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portainer
+  labels:
+    app: portainer
+spec:
+  selector:
+    matchLabels:
+      app: portainer
+  template:
+    metadata:
+      labels:
+        app: portainer
+    spec:
+      containers:
+      - name: portainer
+        image: portainer/portainer:latest
+        ports:
+        - containerPort: 9000
+        resources:
+          limits:
+            memory: "32Mi"
+            cpu: "100m"
+        volumeMounts:
+          - mountPath: /data
+            name: portainer-volume
+          - mountPath: /var/run/docker.sock
+            name: docker-socket
+      volumes:
+        - name: portainer-volume
+          emptyDir: {}
+        - name: docker-socket
+          hostPath:
+            path: /var/run/docker.sock
+            type: Socket
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      tolerations:
+        - key: "node-role.kubernetes.io/master"
+          operator: "Exists"
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: portainer
+  labels:
+    app: portainer
+spec:
+  selector:
+    app: portainer
+  ports:
+  - port: 9000
+    targetPort: 9000
+  type: NodePort
