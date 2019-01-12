@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ipsec-vpn
+  labels:
+    app: ipsec-vpn
+spec:
+  selector:
+    matchLabels:
+      app: ipsec-vpn
+  template:
+    metadata:
+      labels:
+        app: ipsec-vpn
+    spec:
+      containers:
+      - name: ipsec-vpn
+        image: hwdsl2/ipsec-vpn-server
+        ports:
+        - containerPort: 500
+          protocol: UDP
+        - containerPort: 4500
+          protocol: UDP
+        resources:
+          limits:
+            memory: "32Mi"
+            cpu: "100m"
+        env:
+          - name: VPN_IPSEC_PSK
+            value: your_ipsec_pre_shared_key
+          - name: VPN_USER
+            value: your_vpn_username
+          - name: VPN_PASSWORD
+            value: your_vpn_password
+        volumeMounts:
+          - mountPath: /lib/modules
+            name: modules
+            readOnly: true
+        securityContext:
+          privileged: true
+      volumes:
+        - name: modules
+          hostPath:
+            path: /lib/modules
+      
+
+          
