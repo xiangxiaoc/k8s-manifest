@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-web
+  labels:
+    app: redis-web
+spec:
+  selector:
+    matchLabels:
+      app: redis-web
+  template:
+    metadata:
+      labels:
+        app: redis-web
+    spec:
+      tolerations:
+        - key: "node-role.kubernetes.io/master"
+          operator: "Exists"    
+      containers:
+      - name: redis-web
+        image: tenstartups/redis-commander
+        ports:
+        - containerPort: 8081
+        # 镜像带entrypoint 这里直接写 redis-server 的参数
+        args:
+          - --redis-host=redis-server
+          - --redis-port=6379
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: redis-web
+  labels:
+    app: redis-web
+spec:
+  selector:
+    app: redis-web
+  ports:
+  - port: 8081
+    targetPort: 8081
+  type: NodePort
