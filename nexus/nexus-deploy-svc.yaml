@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nexus
+  labels:
+    app: nexus
+spec:
+  selector:
+    matchLabels:
+      app: nexus
+  template:
+    metadata:
+      labels:
+        app: nexus
+    spec:
+      containers:
+      - name: nexus
+        image: sonatype/nexus3
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8081
+        resources:
+          limits:
+            memory: "0"
+            cpu: "0"        
+        volumeMounts:
+          - mountPath: /nexus-data
+            name: nexus-data
+      volumes:
+        - name: nexus-data
+          persistentVolumeClaim:
+            claimName: nexus3-data-pvc
+      nodeSelector:
+        kubernetes.io/hostname: NODE_NAME
+      tolerations:
+        - key: "node-role.kubernetes.io/master"
+          operator: "Exists"
+      
+
+--- 
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: nexus
+  labels:
+    app: nexus
+spec:
+  selector:
+    app: nexus
+  ports:
+  - port: 8081
+    targetPort: 8081
+    name: web-ui
+  type: NodePort
