@@ -55,3 +55,21 @@ spec:
   - port: 9000
     targetPort: 9000
   type: NodePort
+
+---
+
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: portainer-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+    - host: .com
+      http:
+        paths:
+          - path: /portainer
+            backend:
+              serviceName: portainer
+              servicePort: 9000
