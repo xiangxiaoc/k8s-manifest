@@ -13,6 +13,7 @@ spec:
       labels:
         app: shadowsocks
     spec:
+      hostNetwork: true
       containers:
       - name: shadowsocks
         image: shadowsocks/shadowsocks-libev
