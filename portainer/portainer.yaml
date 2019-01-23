@@ -13,6 +13,10 @@ spec:
       labels:
         app: portainer
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: ""
+      tolerations:
+        - operator: "Exists"
       containers:
       - name: portainer
         image: portainer/portainer:latest
@@ -34,11 +38,6 @@ spec:
           hostPath:
             path: /var/run/docker.sock
             type: Socket
-      nodeSelector:
-        node-role.kubernetes.io/master: ""
-      tolerations:
-        - key: "node-role.kubernetes.io/master"
-          operator: "Exists"
 
 ---
 
