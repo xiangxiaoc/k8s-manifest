@@ -19,6 +19,7 @@ spec:
       containers:
       - name: redis-web
         image: tenstartups/redis-commander
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8081
         # 镜像带entrypoint 这里直接写 redis-server 的参数

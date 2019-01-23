@@ -18,6 +18,7 @@ spec:
       containers:
       - name: elasticsearch-head
         image: mobz/elasticsearch-head:5
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 9100
         resources:
