@@ -13,8 +13,8 @@ spec:
       labels:
         app: portainer
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: ""
+      # nodeSelector:
+      #   kubernetes.io/hostname: ""
       tolerations:
         - operator: "Exists"
       containers:
@@ -62,14 +62,11 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: portainer-ingress
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-    - host: .com
+    - host: portainer.xxx.com
       http:
         paths:
-          - path: /portainer
-            backend:
+          - backend:
               serviceName: portainer
               servicePort: 9000
