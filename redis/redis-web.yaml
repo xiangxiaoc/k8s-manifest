@@ -24,7 +24,7 @@ spec:
         - containerPort: 8081
         # 镜像带entrypoint 这里直接写 redis-server 的参数
         args:
-          - --redis-host=redis-server
+          - --redis-host=redis-service
           - --redis-port=6379
         resources:
           limits:
