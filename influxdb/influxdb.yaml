@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: influxdb
+spec:
+  selector:
+    matchLabels:
+      app: influxdb
+  template:
+    metadata:
+      labels:
+        app: influxdb
+    spec:
+      containers:
+      - name: influxdb
+        image: influxdb:1.7.3
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8086
+        resources:
+          limits:
+            memory: "1024Mi"
+            cpu: "1"
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+        volumeMounts:
+          - mountPath: /var/lib/influxdb
+            name: influxdb-data
+      volumes:
+        - name: influxdb-data
+          emptyDir: {}
+      nodeSelector:
+        node-role.kubernetes.io/master: ""
+      tolerations:
+        - key: "node-role.kubernetes.io/master"
+          operator: "Exists"
+
+---
+
+kind: Service
+apiVersion: v1
+metadata:
+  name: influxdb
+spec:
+  selector:
+    app: influxdb
+  ports:
+  - port: 8086
+    targetPort: 8086
+    name: api-port
+    nodePort: 31003
+  type: NodePort
