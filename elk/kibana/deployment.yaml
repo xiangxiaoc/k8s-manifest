@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+  namespace: default
+spec:
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+    spec:
+      containers:
+      - name: kibana
+        image: registry.cn-hangzhou.aliyuncs.com/xiangxiaoc/kibana:7.1.1-elastalert
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "1000m"
+          requests:
+            memory: "400Mi"
+            cpu: "100m"
+        ports:
+        - name: http
+          containerPort: 5601
+        # env:
+        #   - name: server.name
+        #     value: kibana
+        #   - name: server.host
+        #     value: "0"
+        #   - name: elasticsearch.hosts
+        #     value: http://elasticsearch:9200
+        #   - name: xpack.monitoring.ui.container.elasticsearch.enabled
+        #     value: 'true'
+        volumeMounts:
+          - name: localtime
+            mountPath: /etc/localtime
+          - name: timezone
+            mountPath: /etc/timezone
+          - name: kibana-config
+            mountPath: /usr/share/kibana/config/kibana.yml
+            subPath: kibana.yml
+      volumes:
+        - name: localtime
+          hostPath:
+            path: /etc/localtime
+        - name: timezone
+          hostPath:
+            path: /etc/timezone
+        - name: kibana-config
+          configMap:
+            name: kibana
+            items:
+              - key: kibana.yml
+                path: kibana.yml

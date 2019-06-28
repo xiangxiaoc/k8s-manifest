@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: elastalert
+  namespace: default
+spec:
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: elastalert # has to match .spec.template.metadata.labels
+  serviceName: "elastalert"
+  replicas: 1 # by default is 1
+  template:
+    metadata:
+      labels:
+        app: elastalert # has to match .spec.selector.matchLabels
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: elastalert
+        image: bitsensor/elastalert:3.0.0-beta.0
+        imagePullPolicy: IfNotPresent
+        # securityContext:
+        #   privileged: true          
+        # resources:
+        #   limits:
+        #     memory: "4Gi"
+        #     cpu: "1000m"
+        #   requests:
+        #     memory: "2Gi"
+        #     cpu: "200m"
+        ports:
+        - containerPort: 3030
+          name: for-kibana
+        - containerPort: 3333
+          name: websockets
+        # env:
+        volumeMounts:
+          # - name: elastalert-data
+          #   mountPath: /opt/elastalert
+          - name: localtime
+            mountPath: /etc/localtime
+          - name: timezone
+            mountPath: /etc/timezone
+          - name: basic-config
+            mountPath: /opt/elastalert-server/config/config.json
+            subPath: config.json
+          - name: config
+            mountPath: /opt/elastalert/config.yaml
+            subPath: config.yaml
+      volumes:
+        - name: localtime
+          hostPath:
+            path: /etc/localtime
+        - name: timezone
+          hostPath:
+            path: /etc/timezone
+        - name: basic-config
+          configMap:
+            name: elastalert
+            items:
+              - key: config.json
+                path: config.json
+        - name: config
+          configMap:
+            name: elastalert
+            items:
+              - key: elastalert.yaml
+                path: config.yaml
+        # - name: elastalert-data
+        #   emptyDir: {}
+  # volumeClaimTemplates:
+  # - metadata:
+  #     name: elastalert-data
+  #   spec:
+  #     accessModes: [ "ReadWriteOnce" ]
+  #     storageClassName: "rbd-sc"
+  #     resources:
+  #       requests:
+  #         storage: 1Gi
