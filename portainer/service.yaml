@@ -1,0 +1,13 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: portainer
+  labels:
+    app: portainer
+spec:
+  selector:
+    app: portainer
+  ports:
+  - port: 9000
+    targetPort: http
+  type: NodePort

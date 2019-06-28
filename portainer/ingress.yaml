@@ -1,0 +1,12 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: portainer-ingress
+spec:
+  rules:
+    - host: portainer.xxx.com
+      http:
+        paths:
+          - backend:
+              serviceName: portainer
+              servicePort: 9000

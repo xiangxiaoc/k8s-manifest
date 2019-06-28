@@ -13,16 +13,13 @@ spec:
       labels:
         app: portainer
     spec:
-      # nodeSelector:
-      #   kubernetes.io/hostname: ""
-      tolerations:
-        - operator: "Exists"
       containers:
       - name: portainer
         image: portainer/portainer:latest
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 9000
+          name: http
         resources:
           limits:
             memory: "32Mi"
@@ -39,34 +36,3 @@ spec:
           hostPath:
             path: /var/run/docker.sock
             type: Socket
-
----
-
-kind: Service
-apiVersion: v1
-metadata:
-  name: portainer
-  labels:
-    app: portainer
-spec:
-  selector:
-    app: portainer
-  ports:
-  - port: 9000
-    targetPort: 9000
-  type: NodePort
-
----
-
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: portainer-ingress
-spec:
-  rules:
-    - host: portainer.xxx.com
-      http:
-        paths:
-          - backend:
-              serviceName: portainer
-              servicePort: 9000
