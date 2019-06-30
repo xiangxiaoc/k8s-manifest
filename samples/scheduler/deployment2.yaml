@@ -1,0 +1,32 @@
+# 通过命令行，创建一个deployment，拥有2个pod，其自身的pod之间在节点级别反亲和
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cce7days-app2-xiangxiaoc
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cce7days-app2-xiangxiaoc
+  template:
+    metadata:
+      labels:
+        app: cce7days-app2-xiangxiaoc
+    spec:
+      containers:
+      - name: cce7days-app2-xiangxiaoc
+        image: nginx
+        resources: {}
+      imagePullSecrets:
+        - name: default-secret
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - cce7days-app1-xiangxiaoc
+              topologyKey: kubernetes.io/hostname
+      schedulerName: default-schedule

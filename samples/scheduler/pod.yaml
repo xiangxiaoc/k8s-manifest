@@ -1,0 +1,28 @@
+# 通过命令行，使用nginx镜像创建一个pod并手动调度到集群中的一个节点
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cce7days-xiangxiaoc
+  labels:
+    app: nginx
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+            - 192.168.52.121 #有EIP的node节点的私网IP地址
+  containers:
+  - name: container-0
+    image: nginx
+    imagePullPolicy: IfNotPresent
+    resources: {}
+  dnsPolicy: ClusterFirst
+  imagePullSecrets:
+    - name: default-secret
+  restartPolicy: Always
+  schedulerName: default-scheduler
+  securityContext: {}

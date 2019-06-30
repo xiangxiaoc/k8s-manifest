@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cce7days-app3-xiangxiaoc
+spec:
+  selector:
+    matchLabels:
+      app: cce7days-app3-xiangxiaoc
+  template:
+    metadata:
+      labels:
+        app: cce7days-app3-xiangxiaoc
+    spec:
+      containers:
+      - name: cce7days-app3-xiangxiaoc
+        image: redis:latest
+        resources: {}
+        ports:
+        - containerPort: 6379
+      imagePullSecrets:
+        - name: default-secret
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: In
+                  values:
+                    - 192.168.52.121

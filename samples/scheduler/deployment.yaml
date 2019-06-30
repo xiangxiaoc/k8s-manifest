@@ -1,0 +1,35 @@
+# 通过命令行，创建一个deployment，拥有2个pod，其自身的pod之间在节点级别反亲和
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: cce7days-app1-xiangxiaoc
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cce7days-app1-xiangxiaoc
+  template:
+    metadata:
+      labels:
+        app: cce7days-app1-xiangxiaoc
+    spec:
+      containers:
+      - name: container-0
+        image: nginx
+        imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: default-secret      
+      affinity: # 此处亲和性设置是为了将pod调度到有EIP的节点，便于下载外网镜像
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - cce7days-app1-xiangxiaoc
+            topologyKey: kubernetes.io/hostname
+      schedulerName: default-scheduler
