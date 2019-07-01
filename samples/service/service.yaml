@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: cce7days-app5-svc-xiangxiaoc
+  labels:
+    app: cce7days-app5-svc-xiangxiaoc
+spec:
+  selector:
+    app: cce7days-app5-pod-xiangxiaoc
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+
