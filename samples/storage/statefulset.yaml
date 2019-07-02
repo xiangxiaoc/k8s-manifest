@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cce7days-app11-xiangxiaoc
+spec:
+  podManagementPolicy: OrderedReady
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: cce7days-app11-xiangxiaoc
+      failure-domain.beta.kubernetes.io/region: cn-east-2
+      failure-domain.beta.kubernetes.io/zone: cn-east-2a
+  serviceName: cce7days-app11-xiangxiaoc
+  template:
+    metadata:
+      labels:
+        app: cce7days-app11-xiangxiaoc
+        failure-domain.beta.kubernetes.io/region: cn-east-2
+        failure-domain.beta.kubernetes.io/zone: cn-east-2a
+    spec:
+      containers:
+        - name: container-0
+          image: nginx
+          imagePullPolicy: IfNotPresent
+          resources: {}
+          volumeMounts:
+            - name: pvc-evs-example
+              mountPath: /tmp
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+        - name: default-secret
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: pvc-evs-example
+          persistentVolumeClaim:
+            claimName: pvc-evs-auto-example
+  updateStrategy:
+    type: RollingUpdate

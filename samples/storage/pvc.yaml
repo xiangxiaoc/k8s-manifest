@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-evs-auto-example
+  annotations:
+    volume.beta.kubernetes.io/storage-class: sata
+    volume.beta.kubernetes.io/storage-provisioner: flexvolume-huawei.com/fuxivol
+  labels:
+    failure-domain.beta.kubernetes.io/region: cn-east-2
+    failure-domain.beta.kubernetes.io/zone: cn-east-2a
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 10Gi
+      
