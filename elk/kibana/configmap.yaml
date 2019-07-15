@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: kibana
-  namespace: default
+  namespace: elk
 data:
   kibana.yml: |
     #
@@ -12,10 +12,10 @@ data:
     # Default Kibana configuration for docker target
     server.name: kibana
     server.host: "0"
-    elasticsearch.hosts: [ "http://elasticsearch:9200" ]
+    elasticsearch.hosts: [ "http://elasticsearch-discovery:9200" ]
     xpack.monitoring.ui.container.elasticsearch.enabled: true
     # Chinese UI
     i18n.locale: "zh-CN"
     # elastalert
-    elastalert-kibana-plugin.serverHost: elastalert
-    elastalert-kibana-plugin.serverPort: 3030
+    # elastalert-kibana-plugin.serverHost: elastalert
+    # elastalert-kibana-plugin.serverPort: 3030
