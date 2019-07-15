@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: elasticsearch-master
+  namespace: elk
+  labels:
+    app: elasticsearch
+    role: master
+spec:
+  replicas: 3
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: elasticsearch
+      role: master
+  serviceName: elasticsearch-discovery
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+        role: master
+    spec:
+      serviceAccount:  elasticsearch-admin
+      terminationGracePeriodSeconds: 10
+      securityContext:
+        fsGroup: 1000      
+      containers:
+      - name: elasticsearch-master
+        image: elasticsearch:7.2.0
+        imagePullPolicy: IfNotPresent
+        command: ["bash", "-c", "ulimit -l unlimited && sysctl -w vm.max_map_count=262144 && chown -R elasticsearch:elasticsearch /usr/share/elasticsearch/data && exec su elasticsearch docker-entrypoint.sh"]
+        securityContext:
+          privileged: true      
+        resources:
+          limits:
+            memory: "1024Mi"
+            cpu: "2"
+          requests:
+            memory: "1024Mi"
+            cpu: "100m"
+        ports:
+        - containerPort: 9200
+          name: http
+        - containerPort: 9300
+          name: tcp
+        env:
+          - name: node.name
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: discovery.seed_hosts
+            value: elasticsearch-discovery
+          - name: cluster.initial_master_nodes
+            value: elasticsearch-master-0,elasticsearch-master-1,elasticsearch-master-2
+          - name: network.host
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: cluster.name
+            value: 'elk-elasticsearch-cluster'
+          - name: "bootstrap.memory_lock"
+            value: "true"            
+          - name: ES_JAVA_OPTS
+            value: '-Xms512m -Xmx512m'
+          # - name: http.cors.enabled
+          #   value: 'true'
+          # - name: http.cors.allow-origin
+          #   value: '*'
+          - name: "node.master"
+            value: "true"
+          - name: "node.data"
+            value: "false"            
+          - name: node.ingest
+            value: "false"
+        volumeMounts:
+          - name: elasticsearch-data
+            mountPath: /usr/share/elasticsearch/data
+          - name: localtime
+            mountPath: /etc/localtime
+          - name: timezone
+            mountPath: /etc/timezone
+      volumes:
+        - name: localtime
+          hostPath:
+            path: /etc/localtime
+        - name: timezone
+          hostPath:
+            path: /etc/timezone
+        - name: elasticsearch-data
+          emptyDir: {}
+  # volumeClaimTemplates:
+  # - metadata:
+  #     name: elasticsearch-data
+  #   spec:
+  #     accessModes: [ "ReadWriteOnce" ]
+  #     storageClassName: rbd
+  #     resources:
+  #       requests:
+  #         storage: 512Mi

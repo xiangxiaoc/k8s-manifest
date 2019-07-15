@@ -1,15 +1,41 @@
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: elasticsearch
+    role: master
+  name: elasticsearch-discovery
+  namespace: elk
+spec:
+  clusterIP: None
+  ports:
+    - port: 9300
+      targetPort: 9300
+      name: tcp
+    - port: 9200
+      targetPort: 9200
+      name: http
+  selector:
+    app: elasticsearch
+    role: master
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: elasticsearch
-  namespace: default
+  name: elasticsearch-data-service
+  namespace: elk
+  labels:
+    app: elasticsearch
+    role: data
 spec:
+  clusterIP: None
+  ports:
+    - port: 9200
+      targetPort: 9200
+      name: outer
+    - port: 9300
+      targetPort: 9300
+      name: inner
   selector:
     app: elasticsearch
-  ports:
-  - port: 9200
-    targetPort: 9200
-    name: http
-  - port: 9300
-    targetPort: 9300
-    name: tcp
+    role: data
